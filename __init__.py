@@ -464,34 +464,20 @@ class GoogleTranslate(QDialog):
                         self.translator = Translator()
                     translation = self.translator.translate(urllib.parse.unquote(query), src=self.sourceLangCode, dest=self.targetLangCode)
                     data = translation.extra_data['parsed']
-                    freq_color_blue = 'rgb(26,115,232)'
-                    freq_color_gray = 'rgb(218,220,224)'
-                    freq_info = '<span class="YF3enc" style="padding:7px 0px;display:inline-flex;"><div class="{}" style="border-radius:1px;height:6px;margin:1px;width:10px;background-color:{};"></div><div class="{}" style="border-radius:1px;height:6px;margin:1px;width:10px;background-color:{};"></div><div class="{}" style="border-radius:1px;height:6px;margin:1px;width:10px;background-color:{};"></div></span>'
                     try:
-                        for d in data[3][5][0]:
-                            part_of_speech = d[0]
-                            tbody_padding_top = ''
-                            if alt_translations:
-                                tbody_padding_top = 'padding-top:1em;'
-                            alt_translations += '<tbody>'
-                            alt_translations += '<tr><th colspan="3" style="color:#1a73e8;font-weight:bold;text-align:left;{}">{}</th></tr>'.format(tbody_padding_top, part_of_speech)
-                            for t in d[1]:
-                                freq_colors = {
-                                    1: ('EiZ8Dd', freq_color_blue, 'EiZ8Dd', freq_color_blue, 'EiZ8Dd', freq_color_blue),
-                                    2: ('EiZ8Dd', freq_color_blue, 'EiZ8Dd', freq_color_blue, 'fXx9Lc', freq_color_gray),
-                                    3: ('EiZ8Dd', freq_color_blue, 'fXx9Lc', freq_color_gray, 'fXx9Lc', freq_color_gray),
-                                }[t[3]]
-                                freq = freq_info.format(*freq_colors)
-                                alt_translations += '<tr><td>{}</td>'.format(t[0])
-                                if self.config["Alternative Translations Meanings Visibility"] == "remove":
-                                    alt_translations += '<td></td>'
-                                elif self.config["Alternative Translations Meanings Visibility"] == "hide":
-                                    alt_translations += '<td style="font-size: 0;">{}</td>'.format(', '.join(t[2]))
-                                else:
-                                    alt_translations += '<td style="color: #5f6368; font-size: 19px;">{}</td>'.format(', '.join(t[2]))
-                                alt_translations += '<td>{}</td></tr>'.format(freq)
-                            alt_translations += '</tbody>'
-                        alt_translations = '<table>' + alt_translations + '</table>'
+                        # custom stuff starts here
+                        WORD_LIMIT = 4
+                        
+                        d = data[3][5][0][0]
+                        translation_data = d[1]
+                        i = 0
+                        for data_point in translation_data:
+                            i += 1
+                            translation = data_point[0]
+                            alt_translations = alt_translations+translation+", "
+                            if i >= WORD_LIMIT: break
+
+                        alt_translations = alt_translations[:-2]
                     except TypeError:
                         pass
                     except IndexError:
